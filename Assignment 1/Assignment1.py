@@ -15,10 +15,10 @@ get_ipython().magic(u'matplotlib inline')
 
 # In[9]:
 
-train_in = np.genfromtxt('/Users/BrianTCook/Desktop/NeuralNetworks/data/train_in.csv', delimiter=',')
-train_out = np.genfromtxt('/Users/BrianTCook/Desktop/NeuralNetworks/data/train_out.csv', delimiter=',')
-test_in = np.genfromtxt('/Users/BrianTCook/Desktop/NeuralNetworks/data/test_in.csv', delimiter=',')
-test_out = np.genfromtxt('/Users/BrianTCook/Desktop/NeuralNetworks/data/test_out.csv', delimiter=',')
+train_in = np.genfromtxt('data/train_in.csv', delimiter=',')
+train_out = np.genfromtxt('data/train_out.csv', delimiter=',')
+test_in = np.genfromtxt('data/test_in.csv', delimiter=',')
+test_out = np.genfromtxt('data/test_out.csv', delimiter=',')
 
 
 # <b>Task 1</b>
@@ -90,8 +90,8 @@ for j in range(9):
 minindex = separations.index(min(separations))
 maxindex = separations.index(max(separations))
 
-print 'hardest to separate are', indexpairs[minindex]
-print 'easiest to separate are', indexpairs[maxindex]
+print ('hardest to separate are', indexpairs[minindex])
+print ('easiest to separate are', indexpairs[maxindex])
 
 
 # <b>Task 2, Training Data</b>
@@ -182,5 +182,40 @@ for met in mets:
 
 # In[ ]:
 
+# <b>Task 3, Bayes classifier: Difference in non-zero idea</b>
 
+rows, columns = train_in.shape
 
+train_in_vectors = [train_in[i,:] for i in range(rows)]
+actual_numbers = [int(train_out[i]) for i in range(rows)]
+
+storing_vectors = [[] for j in range(10)]
+
+#matching train_in and train_out
+for i in range(rows):
+    j = actual_numbers[i]
+    into_j_bin = storing_vectors[j]
+    into_j_bin.append(train_in_vectors[i])
+
+# average amount of -1 in all 3's
+amount_threes = len(storing_vectors[3])
+activated_in_threes = 0
+for x in range(amount_threes):
+   for y in range(256):
+      if storing_vectors[1][x][y] != -1: 
+         activated_in_threes = activated_in_threes + 1
+
+print('Average X for threes: ', activated_in_threes / amount_threes)
+
+# average amount of -1 in all 8's
+amount_eights = len(storing_vectors[8])
+activated_in_eights = 0
+for x in range(amount_eights):
+   for y in range(256):
+      if storing_vectors[1][x][y] != -1: 
+         activated_in_eights = activated_in_eights + 1
+
+print('Average X for eights: ', activated_in_eights / amount_eights)
+         
+      
+      
