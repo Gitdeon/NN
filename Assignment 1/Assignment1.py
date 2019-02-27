@@ -207,12 +207,6 @@ for x in range(amount_ones):
    Asymmetry_ones_bin = np.append(Asymmetry_ones_bin, asymmetry)
 print('Average asymmetry value for ones:', sum(Asymmetry_ones_bin)/amount_ones)
 
-plt.hist(Asymmetry_ones_bin)
-plt.title("Asymmetry histogram for the digit one")
-plt.show()
-
-P_one = amount_ones / rows #P(one)
-
 # Calculate asymmetry values for 5's (Average difference between right/left side of images) and add bins
 amount_fives = len(storing_vectors[5])
 Asymmetry_fives_bin = np.array([])
@@ -223,11 +217,17 @@ for x in range(amount_fives):
    Asymmetry_fives_bin = np.append(Asymmetry_fives_bin, asymmetry)
 print('Average asymmetry value for fives:', sum(Asymmetry_fives_bin)/amount_fives)
 
-plt.hist(Asymmetry_fives_bin)
+#plot histograms 
+plt.hist([Asymmetry_ones_bin, Asymmetry_fives_bin], bins = 20, label=['Ones','Fives'])
 plt.title("Asymmetry histogram for the digit five")
+plt.legend(loc ='upper right')
 plt.show()
 
+#Estimate probabilities 
+P_one = amount_ones / rows #P(one)
 P_five = amount_fives / rows #P(five)
+
+
 
 
 
