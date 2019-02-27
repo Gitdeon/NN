@@ -182,7 +182,7 @@ for met in mets:
 
 # In[ ]:
 
-# <b>Task 3, Bayes classifier: Difference in non-zero idea</b>
+# <b> Task 3, Bayes classifier: Asymmetry idea </b>
 
 rows, columns = train_in.shape
 
@@ -197,25 +197,73 @@ for i in range(rows):
     into_j_bin = storing_vectors[j]
     into_j_bin.append(train_in_vectors[i])
 
-# average amount of -1 in all 3's
-amount_threes = len(storing_vectors[3])
-activated_in_threes = 0
-for x in range(amount_threes):
-   for y in range(256):
-      if storing_vectors[1][x][y] != -1: 
-         activated_in_threes = activated_in_threes + 1
+# Calculate asymmetry values for 1's (Average difference between right/left side of images) and add bins
+amount_ones = len(storing_vectors[1])
+Asymmetry_ones_bin = np.array([])
+for x in range(amount_ones):
+   asymmetry = 0;
+   for y in range(0, 256,16):
+      asymmetry = asymmetry + sum(abs(storing_vectors[1][x][range(y-8,y)] - list(reversed(storing_vectors[1][x][range(y, y+8)]))))
+   Asymmetry_ones_bin = np.append(Asymmetry_ones_bin, asymmetry)
+print('Average asymmetry value for ones:', sum(Asymmetry_ones_bin)/amount_ones)
 
-print('Average X for threes: ', activated_in_threes / amount_threes)
+plt.hist(Asymmetry_ones_bin)
+plt.title("Asymmetry histogram for the digit one")
+plt.show()
 
-# average amount of -1 in all 8's
-amount_eights = len(storing_vectors[8])
-activated_in_eights = 0
-for x in range(amount_eights):
-   for y in range(256):
-      if storing_vectors[1][x][y] != -1: 
-         activated_in_eights = activated_in_eights + 1
+P_one = amount_ones / rows #P(one)
 
-print('Average X for eights: ', activated_in_eights / amount_eights)
-         
-      
-      
+# Calculate asymmetry values for 5's (Average difference between right/left side of images) and add bins
+amount_fives = len(storing_vectors[5])
+Asymmetry_fives_bin = np.array([])
+for x in range(amount_fives):
+   asymmetry = 0
+   for y in range(0, 256,16):
+      asymmetry = asymmetry + sum(abs(storing_vectors[5][x][range(y-8,y)] - list(reversed(storing_vectors[5][x][range(y, y+8)]))))
+   Asymmetry_fives_bin = np.append(Asymmetry_fives_bin, asymmetry)
+print('Average asymmetry value for fives:', sum(Asymmetry_fives_bin)/amount_fives)
+
+plt.hist(Asymmetry_fives_bin)
+plt.title("Asymmetry histogram for the digit five")
+plt.show()
+
+P_five = amount_fives / rows #P(five)
+
+
+
+
+
+
+
+
+
+
+'''
+# EXTRA -- Calculate all symmetry values to get an idea of how it performs:
+for i in range(10):
+   amount = len(storing_vectors[i])
+   Asymmetry_value = 0
+   for x in range(amount):
+      for y in range(0, 256,16):
+         Asymmetry_value = Asymmetry_value + sum(abs(storing_vectors[i][x][range(y-8,y)] - list(reversed(storing_vectors[i][x][range(y, y+8)]))))
+   print('Average asymmetry value for', i, ': ', Asymmetry_value/amount)
+   
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
