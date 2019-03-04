@@ -1,31 +1,34 @@
+def activation(input_vec, weight_vec): #uses 
+    summation = np.dot(input_vec, weight_vec[1:]) + weight_vec[0]
+    #step function
+    if summation > 0:
+        return 0 #correctly classified
+    else:
+        return 1 #incorrectly classified
+
 class perceptron(object):
     
     def __init__(self, len_input, threshold, learning_rate):
         self.len_input = len_input
         self.threshold = threshold
         self.learning_rate = learning_rate
-        self.weights = np.zeros((len_input+1, 10)) #need a vector of weights for each digit 0-9
-
-    def predict(input_vec, weight_vec): #len(weight_vec) = len(input_vec) + 1
-        summation = np.dot(input_vec, weight_vec[1:]) + weight_vec[0]
-        if summation > 0:
-            return 1
-        else:
-            return 0
-
+        #need a vector of weights for each digit 0-9, initialize randomly
+        self.weights = np.random.rand(len_input+1, 10) 
+        
     def train(self, inputs, outputs):
         count = 0
         while count < self.threshold:
             for input_vec, output in zip(inputs, outputs):
                 weight_vec = self.weights[:,output]
-                prediction = predict(input_vec, weight_vec)
-                self.weights[1:, output] += learning_rate * (output-prediction)*input_vec
-                self.weights[0, output] += learning_rate * (output-prediction)
+                #determine if weights need to be adjusted
+                activation_w_x = activation(input_vec, weight_vec) 
+                self.weights[1:, output] += learning_rate * activation_w_x * input_vec
+                self.weights[0, output] += learning_rate * activation_w_x
             count += 1
         
         return self.weights
 
-len_input, threshold, learning_rate = len(train_in[0]), 100, 0.01
+len_input, threshold, learning_rate = len(train_in[0]), 200, 0.01
 
 #sets up weights matrix on which the MNIST data can be applied
 W = perceptron(len_input, threshold, learning_rate)
@@ -72,8 +75,6 @@ def confusion(actual, predicted, title):
     plt.colorbar()
 
     plt.savefig('Task4_%s.pdf'%title)
-    
-    return 1
 
 train_outputs_from_W = get_output(train_in)
 test_outputs_from_W = get_output(test_in)
