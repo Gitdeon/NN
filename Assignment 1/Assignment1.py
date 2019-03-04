@@ -228,32 +228,41 @@ plt.show()
 P_one = amount_ones / rows #P(one)
 P_five = amount_fives / rows #P(five)
 bins = np.array(range(0,100,10)) #use 10 bins
+one_bins = np.digitize(Asymmetry_ones_bin, bins)
+five_bins = np.digitize(Asymmetry_fives_bin, bins)
 
+bayesian_out = np.array([])
 for i in range(len(test_in)):
    #calculate asymmetry of digit
+   X = 0
    for x in range(0,256,16):
       X = X + sum(abs(test_in[i][range(x-8,x)] - list(reversed(test_in[i][range(x, x+8)]))))
-      X = np.digitize(X, bins)
       
-      #Calculate P(X=x|one)
-      one_bins = np.digitize(Asymmetry_ones_bin, bins)
-      one_count = np.count_nonzero(one_bins == X)
-      P_X_given_one = one_count / amount_ones
+   X = np.digitize(X, bins)   
+   #Calculate P(X=x|one)
+   one_count = np.count_nonzero(one_bins == X)
+   P_X_given_one = one_count / amount_ones
       
-      #Calculate P(X=x|five)
-      five_bins = np.digitize(Asymmetry_fives_bin, bins)
-      five_count = np.count_nonzero(five_bins == X)
-      P_X_given_five = five_count / amount_fives
+   #Calculate P(X=x|five)
+   five_count = np.count_nonzero(five_bins == X)
+   P_X_given_five = five_count / amount_fives
       
-      '''To do: calculate P_X '''
+   P_X = (one_count + five_count) / (amount_ones + amount_fives)
       
-      P_one_given_X = P_X_given_one * P_one / P_X #Calculate P(one|X=x)
-      P_five_given_X = P_X_given_five * P_five / P_X #Calculate P(five|X=x)
+   P_one_given_X = P_X_given_one * P_one / P_X #Calculate P(one|X=x)
+   P_five_given_X = P_X_given_five * P_five / P_X #Calculate P(five|X=x)
       
-      if P_one_given_X > P_five_fiven_X:
-         #Classify as one
-      else: #Classify as five
+   if P_one_given_X > P_five_given_X:
+      bayesian_out = np.append(bayesian_out, 1)
+   else: bayesian_out = np.append(bayesian_out, 5)
 
+ones_array = bayesian_out[np.where(test_out == 1)] 
+fives_array = bayesian_out[np.where(test_out == 5)] 
+
+print("Correctly classified ones:", np.count_nonzero(ones_array == 1), "/", len(ones_array))
+print("Correctly classified fives:", np.count_nonzero(fives_array == 5), "/", len(fives_array))
+print("Total accuracy:", (np.count_nonzero(ones_array == 1) + np.count_nonzero(fives_array == 5)) / (len(ones_array)+ len(fives_array)))
+   
 '''
 # EXTRA -- Calculate all symmetry values to get an idea of how it performs:
 for i in range(10):
