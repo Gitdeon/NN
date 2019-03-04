@@ -4,6 +4,7 @@
 # In[8]:
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import random
@@ -218,25 +219,40 @@ for x in range(amount_fives):
 print('Average asymmetry value for fives:', sum(Asymmetry_fives_bin)/amount_fives)
 
 #plot histograms 
-plt.hist([Asymmetry_ones_bin, Asymmetry_fives_bin], bins = 20, label=['Ones','Fives'])
-plt.title("Asymmetry histogram for the digit five")
+plt.hist([Asymmetry_ones_bin, Asymmetry_fives_bin], bins = 10, label=['Ones','Fives'])
+plt.title("Histograms")
 plt.legend(loc ='upper right')
 plt.show()
 
 #Estimate probabilities 
 P_one = amount_ones / rows #P(one)
 P_five = amount_fives / rows #P(five)
+bins = np.array(range(0,100,10)) #use 10 bins
 
-
-
-
-
-
-
-
-
-
-
+for i in range(len(test_in)):
+   #calculate asymmetry of digit
+   for x in range(0,256,16):
+      X = X + sum(abs(test_in[i][range(x-8,x)] - list(reversed(test_in[i][range(x, x+8)]))))
+      X = np.digitize(X, bins)
+      
+      #Calculate P(X=x|one)
+      one_bins = np.digitize(Asymmetry_ones_bin, bins)
+      one_count = np.count_nonzero(one_bins == X)
+      P_X_given_one = one_count / amount_ones
+      
+      #Calculate P(X=x|five)
+      five_bins = np.digitize(Asymmetry_fives_bin, bins)
+      five_count = np.count_nonzero(five_bins == X)
+      P_X_given_five = five_count / amount_fives
+      
+      '''To do: calculate P_X '''
+      
+      P_one_given_X = P_X_given_one * P_one / P_X #Calculate P(one|X=x)
+      P_five_given_X = P_X_given_five * P_five / P_X #Calculate P(five|X=x)
+      
+      if P_one_given_X > P_five_fiven_X:
+         #Classify as one
+      else: #Classify as five
 
 '''
 # EXTRA -- Calculate all symmetry values to get an idea of how it performs:
