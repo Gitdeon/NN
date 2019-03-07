@@ -4,11 +4,7 @@
 # In[8]:
 
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import random
-import itertools
 from sklearn.metrics.pairwise import pairwise_distances
 
 get_ipython().magic(u'matplotlib inline')
@@ -264,17 +260,15 @@ print("Correctly classified ones:", np.count_nonzero(ones_array == 1), "/", len(
 print("Correctly classified fives:", np.count_nonzero(fives_array == 5), "/", len(fives_array))
 print("Total accuracy:", (np.count_nonzero(ones_array == 1) + np.count_nonzero(fives_array == 5)) / (len(ones_array)+ len(fives_array)))
    
-'''
-# EXTRA -- Calculate all symmetry values to get an idea of how it performs:
-for i in range(10):
-   amount = len(storing_vectors[i])
-   Asymmetry_value = 0
-   for x in range(amount):
-      for y in range(0, 256,16):
-         Asymmetry_value = Asymmetry_value + sum(abs(storing_vectors[i][x][range(y-8,y)] - list(reversed(storing_vectors[i][x][range(y, y+8)]))))
-   print('Average asymmetry value for', i, ': ', Asymmetry_value/amount)
-   
-'''
+
+#EXTRA -- Calculate all symmetry values to get an idea of how it performs:
+#for i in range(10):
+#   amount = len(storing_vectors[i])
+#   Asymmetry_value = 0
+#   for x in range(amount):
+#      for y in range(0, 256,16):
+#         Asymmetry_value = Asymmetry_value + sum(abs(storing_vectors[i][x][range(y-8,y)] - list(reversed(storing_vectors[i][x][range(y, y+8)]))))
+#   print('Average asymmetry value for', i, ': ', Asymmetry_value/amount)
 
 # In[ ]:
 
@@ -368,6 +362,117 @@ confusion(test_out, test_outputs_from_W, 'Testing')
 
 # <b> Task 5: Implement the gradient descent algorithm </b>
 
+#Activation functions definition
+def sigmoid(x):
+   return 1 / (1 + np.exp(-x))
+def relu(x):
+   return np.maximum(0,x)
+
+#Simulate NN output for nodes & weights input, comment/uncomment to switch activation functions
+def xor_net(x1,x2,weights):
+   y = np.dot(np.array([weights[0],weights[1]]),np.array([1,x1,x2]))
+   
+   #Sigmoid function
+   y = list(map(lambda y: sigmoid(y), y))
+   z = sigmoid(np.dot(np.array(weights[2]),np.array([1,y[0],y[1]])))
+   
+   #Relu function
+   #y = list(map(lambda y: relu(y), y))
+   #z = relu(np.dot(np.array(weights[2]),np.array([1,y[0],y[1]])))
+   
+   #Hyperbolic tangent function
+   #y = list(map(lambda y: np.tanh(y), y))
+   #z = np.tanh(np.dot(np.array(weights[2]),np.array([1,y[0],y[1]])))
+   return z
+
+#Calculate MSE for given weights
+def mse(weights):
+   mse_11 = (0-xor_net(1,1,weights))**2
+   mse_10 = (1-xor_net(1,0,weights))**2
+   mse_01 = (1-xor_net(0,1,weights))**2
+   mse_00 = (0-xor_net(0,0,weights))**2
+   total_mse = mse_11 + mse_10 + mse_01 + mse_00
+   return total_mse
+
+#Count amount of misclassified XOR inputs with given weights
+def missclassified(weights):
+   missclassified = 0
+   if xor_net(0,0,weights) > 0.5:
+      missclassified += 1
+   if xor_net(0,1,weights) <= 0.5:
+      missclassified += 1
+   if xor_net(1,0,weights) <= 0.5:
+      missclassified += 1
+   if xor_net(1,1,weights) > 0.5:
+      missclassified += 1
+   return missclassified
+
+#Calculate MSE gradient with given weights
+def grdmse(weights):
+   error = pow(10, -3) #avoid division by zero
+   columns = weights.shape[1]
+   rows = weights.shape[0]
+   grdmse = np.zeros((3,3))
+   for i in range(rows):
+      for j in range(columns):
+         a = np.zeros((3,3))
+         a[i][j] = error
+         grdmse[i][j] = (mse(weights + a) - mse(weights)) / error
+   return grdmse
+
+#Train XOR network with 4000 iterations
+def train_xor_net(learningrate, net_input):
+   np.random.seed(42)
+   if net_input == 'normal':
+      weights = np.random.randn(3,3) #normal dist with mean = 0 and variance = 1
+   if net_input == 'uniform':
+      weights = np.random.uniform(-1,1,9).reshape(3,3) #uniform dist from -1 to 1
+   iterator = 0
+   mse_list = []
+   missclassifiedlist = []
+   while iterator < 4000:
+      weights = weights-learningrate * grdmse(weights)
+      mse_list.append(mse(weights))
+      missclassifiedlist.append(missclassified(weights))
+      iterator += 1
+   return weights, mse_list, missclassifiedlist
+
+
+#Calculate intermediate results for various initialized weights and learning rates
+weights, mse_list, missclassifiedlist = np.full((2,3,3,3), 0),np.zeros((2,3,4000)),np.zeros((2,3,4000))
+learningrate = [0.1,0.25,0.5]
+net_input = ['normal','uniform']
+for i in range (2):
+   for j in range(3):
+      weights[i][j], mse_list[i][j], missclassifiedlist[i][j] = train_xor_net(learningrate[j],net_input[i])
+
+#Plot MSE and amount of misclassified cases for various initialized weights and learning rates
+plot = plt.figure()
+for i in range(2):
+   for j in range(3):
+      axis = plot.add_subplot(2,3,3*i+j+1, label="1")
+      axis_2 = plot.add_subplot(2,3,3*i+j+1, label="2", frame_on=False)
+      
+      axis.plot(range(len(mse_list[i][j])), mse_list[i][j], color="blue")
+      axis.set_xticks([0,1000,2000,3000,4000])
+      axis.set_xticklabels(['0','1','2','3','4'])
+      axis.set_xlabel("Iterations (x 1000)", color="k")
+      axis.set_ylabel("Mean squared error", color="blue")
+      axis.set_ylim([0,1])
+      axis.tick_params(axis='y', colors="blue")
+      
+      axis_2.plot(range(len(missclassifiedlist[i][j])), missclassifiedlist[i][j], color="green")
+      plt.text(1500, 2.8, r'$\eta=$'+str(learningrate[j]))
+      axis_2.set_xticks([0,1000,2000,3000,4000])
+      axis_2.set_xticklabels(['0','1','2','3','4'])
+      axis_2.yaxis.tick_right()
+      axis_2.set_ylabel('Missclassified units', color="green")
+      axis_2.set_ylim([0,4])
+      axis_2.yaxis.set_label_position('right')
+      axis_2.tick_params(axis='y', colors="green")
+
+plt.subplots_adjust(hspace=0.5, wspace=1)
+plt.savefig('Sigmoid activation function')
 
 
 
