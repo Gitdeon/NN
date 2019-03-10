@@ -7,7 +7,7 @@ for i in range(2):
 
         axis.plot(range(len(mse_list[i][j])), mse_list[i][j], color="blue")
 
-        axis.set_title('%s, learning rate = %s'%(net_input[i], str(learningrate[j])), fontsize = 8)
+        axis.set_title('%s, \eta = %s'%(net_input[i], str(learningrate[j])), fontsize = 8)
         axis.set_xticks([0,1000,2000,3000,4000])
         axis.set_xticklabels(['0','1','2','3','4'], fontsize = 8)
         axis.set_xlabel("Iterations (x 1000)", color="k", fontsize = 8)
@@ -16,7 +16,6 @@ for i in range(2):
         axis.tick_params(axis='y', colors="blue")
 
         axis_2.plot(range(len(missclassifiedlist[i][j])), missclassifiedlist[i][j], color="green")
-        plt.text(1500, 2.8, r'$\eta=$'+str(learningrate[j]))
         axis_2.set_xticks([0,1000,2000,3000,4000])
         axis_2.set_xticklabels(['0','1','2','3','4'], fontsize = 8)
         axis_2.yaxis.tick_right()
