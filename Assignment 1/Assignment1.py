@@ -304,7 +304,7 @@ class perceptron(object):
         
         return self.weights
 
-len_input, threshold, learning_rate = len(train_in[0]), 200, 0.01
+len_input, threshold, learning_rate = len(train_in[0]), 100, 0.01
 
 #sets up weights matrix on which the MNIST data can be applied
 W = perceptron(len_input, threshold, learning_rate)
