@@ -1,5 +1,13 @@
+##############################################
+#                                            #
+#        Neural Networks: Assignment 1       #
+#        Spring Semester                     #
+#                                            #
+#        Please find the solutions to        #
+#        all five tasks below.               #
+#                                            #
+##############################################
 
-# coding: utf-8
 
 # In[8]:
 
