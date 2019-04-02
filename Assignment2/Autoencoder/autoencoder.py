@@ -7,10 +7,10 @@ test_set = np.loadtxt('data/fashion-mnist_test.csv', delimiter=',', skiprows=1)[
 
 #encoding
 n_nodes_input = 784 
-n_nodes_hidden1  = 32  
+n_nodes_hidden1  = 64
 
 #decoding
-n_nodes_hidden2  = 32 
+n_nodes_hidden2  = 64
 n_nodes_output = 784 
 
 hidden1_values = {
@@ -70,11 +70,16 @@ for epoch in range(hm_epochs):
                output_true: epoch_x})
         epoch_loss += c
     print('Epoch', epoch, '/', hm_epochs, 'loss:',epoch_loss)
-    
-any_image = test_set[0]
-output_any_image = sess.run(output_layer, feed_dict={input_layer:[any_image]})
+
+
 encoded_any_image = sess.run(layer_1, feed_dict={input_layer:[any_image]})
+
+any_image = training_set[0]
 plt.imshow(any_image.reshape(28,28),  cmap='Greys')
+plt.show()
+
+output_any_image = sess.run(output_layer, feed_dict={input_layer:[any_image]})
 plt.imshow(output_any_image.reshape(28,28),  cmap='Greys')
+plt.show()
 
 print(encoded_any_image)
