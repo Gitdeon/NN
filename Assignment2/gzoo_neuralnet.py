@@ -45,7 +45,7 @@ def CNN(activation_fn, n_layers):
         '''
 
         model = models.Sequential()
-        model.add(layers.Conv2D(32, (3, 3), activation=activation_fn, input_shape=(28,28,1)))
+        model.add(layers.Conv2D(32, (3, 3), activation=activation_fn, input_shape=(128,128,1)))
         model.add(layers.MaxPooling2D((2,2)))
 
         n = 2
