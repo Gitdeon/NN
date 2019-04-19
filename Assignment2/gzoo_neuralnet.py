@@ -124,13 +124,13 @@ for i in range(len(plots)):
         ax = plots[i]
         ax.tick_params(left = True, bottom = True, right = False, top = False, labelsize = 'small')
         if i == 0:
-                ax.scatter(range(len(accuracies_fns_plotting), accuracies_fns_plotting)
+                ax.scatter(range(len(accuracies_fns_plotting)), accuracies_fns_plotting)
                 ax.set_xticklabels(activation_fns_plotting)
                 ax.set_ylabel(r'$f$(activation function) [%/100]', fontsize = 10)
                 ax.set_xlabel(r'$f \equiv$ accuracy', fontsize = 10)
                 ax.xaxis.set_label_position('top')
         if i == 1:
-                ax.scatter(range(len(accuracies_fns_plotting), runtimes_fns_plotting)
+                ax.scatter(range(len(accuracies_fns_plotting)), runtimes_fns_plotting)
                 ax.set_xticklabels(activation_fns_plotting)
                 ax.set_ylabel(r'$g$(activation function) [s]', fontsize = 10)
                 ax.set_xlabel(r'$g \equiv$ runtime', fontsize = 10)
