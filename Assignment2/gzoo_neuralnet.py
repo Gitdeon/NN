@@ -107,7 +107,42 @@ accuracies_fns_plotting = [ifp[3] for ifp in information_for_plots]
 runtimes_fns_plotting = [ifp[4] for ifp in information_for_plots]
 
 '''
-use activation_fn = 'relu' and n_layers = 6 as the controls for each of the panels 
-('relu', n_layers = 6,8,..), (activation_fn = 'relu',... , 6)
+use activation_fn = 'relu' and n_layers = 5 as the controls for each of the panels 
+('relu', n_layers = 5, 7, 11), (activation_fn = 'relu',... , n_layers = 5)
 '''
+
+plt.rc('test', usetex = True)
+plt.rc('font', family = 'serif')
+
+divider, eps = 3.3, 0.09 #for plotting using fig.add_axes
+
+fig = plt.figure()
+xvals, yvals = [eps, eps+(1-eps)/divider], [eps, eps+(1-eps)/divider]
+plots = [fig.add_axes([x0, y0, (1-eps)/divider, (1-eps)/divider]) for x0 in xvals for y0 in yvals]
+
+for i in range(len(plots)):
+        ax = plots[i]
+        ax.tick_params(left = True, bottom = True, right = False, top = False, labelsize = 'small')
+        if i == 0:
+                ax.scatter(range(len(accuracies_fns_plotting)), accuracies_fns_plotting)
+                ax.set_xticklabels(activation_fns_plotting)
+                ax.set_ylabel(r'$f$(activation function) [%/100]', fontsize = 10)
+                ax.set_xlabel(r'$f \equiv$ accuracy', fontsize = 10)
+                ax.xaxis.set_label_position('top')
+        if i == 1:
+                ax.scatter(range(len(accuracies_fns_plotting)), runtimes_fns_plotting)
+                ax.set_xticklabels(activation_fns_plotting)
+                ax.set_ylabel(r'$g$(activation function) [s]', fontsize = 10)
+                ax.set_xlabel(r'$g \equiv$ runtime', fontsize = 10)
+                ax.xaxis.set_label_position('top')
+        if i == 2:
+                ax.plot(n_layers_plotting, accuracies_fns_plotting)
+                ax.set_xticks(n_layers_plotting)
+                ax.set_ylabel(r'$f(N_{layers})$', fontsize = 10)
+                ax.set_xlabel(r'$N_{layers}$', fontsize = 10)
+        if i == 3:
+                ax.plot(n_layers_plotting, runtimes_fns_plotting)
+                ax.set_xticks(n_layers_fns_plotting)
+                ax.set_ylabel(r'$g(N_{layers})$', fontsize = 10)
+                ax.set_xlabel(r'$N_{layers}$', fontsize = 10)
                                                                                                                                                                                                                             115,1         Bot
