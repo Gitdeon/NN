@@ -4,9 +4,11 @@ import numpy as np
 import matplotlib as plt
 import cv2 #pip3 install opencv-python
 import tensorflow as tf
+import keras.backend as K
 from keras import datasets, layers, models
 from sklearn.model_selection import train_test_split
 
+K.set_image_dim_ordering('tf')
 os.environ["CUDA_VISIBLE_DEVICES"] = '0' #use GPU with ID = 0
 
 jpg_paths = glob.glob('data/images_training_rev1/*.jpg')
@@ -16,7 +18,7 @@ jpg_paths = np.sort(jpg_paths)
 galaxy_images = []
 for i in range(8000): #test with small sample; replace with range(len(jpg_paths))
     jpg = cv2.imread(jpg_paths[i])
-    galaxy_images.append(cv2.resize(jpg, dsize=(128, 128), interpolation=cv2.INTER_CUBIC))
+    galaxy_images.append(cv2.resize(jpg, dsize=(60, 60), interpolation=cv2.INTER_CUBIC))
     if i % 1000 == 0: print('Loaded ', i, 'images.')
 
 #Get predicitions
@@ -29,9 +31,35 @@ images_train, images_test, solutions_train, solutions_test = train_test_split(ga
 
 #Normalize pixel values to be between 0 and 1
 for i in range(len(images_train)):
-    images_train[i] = images_train[i]/255.0
+    images_train[i] = np.array(images_train[i]/255.0)
 for i in range(len(images_test)):
-    images_test[i] = images_test[i]/255.0
+    images_test[i] = np.array(images_test[i]/255.0)
+
+'''
+    CNN OUTLINE:
+    
+activation_fn = 'relu'
+model = models.Sequential()
+model.add(layers.Conv2D(filters=96, kernel_size=11, strides=4, padding='same', activation=activation_fn, input_shape=(60,60,3)))
+model.add(layers.MaxPooling2D(pool_size=3, strides=2,padding='same'))
+model.add(layers.Conv2D(filters=265, kernel_size=5, padding='same', activation=activation_fn))
+model.add(layers.MaxPooling2D(pool_size=3, strides=2,padding='same'))
+
+model.add(layers.Conv2D(filters=384, kernel_size=3, padding='same', activation=activation_fn))
+model.add(layers.Conv2D(filters=384, kernel_size=3, padding='same', activation=activation_fn))
+model.add(layers.Conv2D(filters=256, kernel_size=3, padding='same', activation=activation_fn))
+model.add(layers.MaxPooling2D(pool_size=2, strides=2, padding='same'))
+model.add(layers.Flatten())
+
+model_shape = model.output_shape[1]
+model.add(layers.Dense(model_shape, activation='relu'))
+model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dense(5, activation='softmax'))
+model.summary()
+
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.fit(images_train, solutions_train, epochs=5)
+'''
 
 '''
     input types must be string and integer, respectively
@@ -46,30 +74,31 @@ def CNN(activation_fn, n_layers):
         '''
             
             model = models.Sequential()
-            model.add(layers.Conv2D(45, (6, 6), activation=activation_fn, input_shape=(45,45,3)))
-            model.add(layers.Conv2D(40, (5, 5), activation=activation_fn))
-            model.add(layers.MaxPooling2D((20,20)))
-            model.add(layers.Conv2D(16, (3, 3), activation=activation_fn))
-            model.add(layers.MaxPooling2D((8,8)))
+            model.add(layers.Conv2D(filters=96, kernel_size=11, strides=4, padding='same', activation=activation_fn, input_shape=(60,60,3)))
+            model.add(layers.MaxPooling2D(pool_size=3, strides=2,padding='same'))
+            model.add(layers.Conv2D(filters=265, kernel_size=5, padding='same', activation=activation_fn))
+            model.add(layers.MaxPooling2D(pool_size=3, strides=2,padding='same'))
             
             n = 2
-                while n < n_layers - 4:
-                
-                model.add(layers.Conv2D(6, (3, 3), activation=activation_fn))
+            while n < n_layers - 4:
+                model.add(layers.Conv2D(filters=384, kernel_size=3, padding='same', activation=activation_fn))
                 n += 1
+
+            model.add(layers.Conv2D(filters=256, kernel_size=3, padding='same', activation=activation_fn))
+            model.add(layers.MaxPooling2D(pool_size=3, strides=2))
+            model.add(layers.Flatten())
+                      
+            model_shape = model.output_shape[1]
+            model.add(layers.Dense(shape, activation='relu'))
+            model.add(layers.Dense(512, activation='relu'))
+            model.add(layers.Dense(5, activation='softmax'))
                     
-                    model.add(layers.Conv2D(4, (2, 2), activation=activation_fn))
-                    model.add(layers.MaxPooling2D((2,2)))
-                    model.add(layers.Flatten())
-                    model.add(layers.Dense(64, activation='relu'))
-                    model.add(layers.Dense(5, activation='softmax'))
+            model.summary()
                     
-                    model.summary()
+            model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+            model.fit(images_train[:], solutions_train, epochs=5)
                     
-                    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-                    model.fit(images_train, solutions_train, epochs=5)
-                    
-                        return model
+            return model
 
 def CNN_performance(activation_fn, n_layers):
     
