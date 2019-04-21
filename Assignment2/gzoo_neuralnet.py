@@ -96,7 +96,7 @@ def CNN(activation_fn, n_layers):
             model.summary()
                     
             model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-            model.fit(images_train[:], solutions_train, epochs=5)
+            model.fit(images_train, solutions_train, epochs=5)
                     
             return model
 
