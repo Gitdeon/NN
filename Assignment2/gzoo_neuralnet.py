@@ -37,11 +37,17 @@ for i in range(8000): #range(len(solutions)
 images_train, images_test, solutions_train, solutions_test = train_test_split(galaxy_images, classification_solutions, test_size=0.2, random_state=42)
 
 #Normalize pixel values to be between 0 and 1
+#not sure the maximum value would be 255 still
+
+maxs_train = [max(it.flatten()) for it in images_train]
+maxs_test = [max(it.flatten()) for it in images_test]
+
+max_train = max(maxs_train)
+max_test = max(maxs_test)
+
 '''
-for i in range(len(images_train)):
-    images_train[i] = np.array(images_train[i]/255.0)
-for i in range(len(images_test)):
-    images_test[i] = np.array(images_test[i]/255.0)
+images_train = [np.array(images_train[i]/max_train) for i in range(len(images_train))]
+images_test = [np.array(images_test[i]/max_train) for i in range(len(images_test))]
 '''
     
 '''
