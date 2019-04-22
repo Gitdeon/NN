@@ -9,18 +9,25 @@ from keras import datasets, layers, models
 from sklearn.model_selection import train_test_split
 
 K.set_image_dim_ordering('tf')
-os.environ["CUDA_VISIBLE_DEVICES"] = '0' #use GPU with ID = 0
+#os.environ["CUDA_VISIBLE_DEVICES"] = '0' #use GPU with ID = 0
+#doesn't need the above line, taken care of in bashrc I think
 
 jpg_paths = glob.glob('data/images_training_rev1/*.jpg')
 jpg_paths = np.sort(jpg_paths)
 
 #Loading all images
+'''
 galaxy_images = []
 for i in range(8000): #test with small sample; replace with range(len(jpg_paths))
-    jpg = cv2.imread(jpg_paths[i])
+    jpg = cv2.imread(jpg_paths[i], 0) #second argument reads in the jpg as grayscale
     galaxy_images.append(cv2.resize(jpg, dsize=(60, 60), interpolation=cv2.INTER_CUBIC))
-    if i % 1000 == 0: print('Loaded ', i, 'images.')
+    if i % 1000 == 0: 
+        print('Loaded ', i, 'images.')
+'''
 
+#list comprehension for commented block above
+galaxy_images = [cv2.resize(cv2.imread(jpg_paths[i], 0), dsize = (60, 60), interpolation = cv2.INTER_CUBIC)) for i in range(8000)]
+        
 #Get predicitions
 solutions = np.loadtxt('data/training_solutions_rev1.csv', delimiter = ',', skiprows=1)
 classification_solutions = []
@@ -30,11 +37,13 @@ for i in range(8000): #range(len(solutions)
 images_train, images_test, solutions_train, solutions_test = train_test_split(galaxy_images, classification_solutions, test_size=0.2, random_state=42)
 
 #Normalize pixel values to be between 0 and 1
+'''
 for i in range(len(images_train)):
     images_train[i] = np.array(images_train[i]/255.0)
 for i in range(len(images_test)):
     images_test[i] = np.array(images_test[i]/255.0)
-
+'''
+    
 '''
     CNN OUTLINE:
     
