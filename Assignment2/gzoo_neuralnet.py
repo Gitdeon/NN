@@ -129,7 +129,7 @@ runtimes_fns_plotting = [ifp[4] for ifp in information_for_plots]
 
 pplt.rc('text', usetex = True)
 pplt.rc('font', family = 'serif')
-fig = plt.figure()
+fig = pplt.figure()
 
 for_second_plot, Xs, Ys = [], [], []
 
@@ -143,11 +143,11 @@ for ifp in information_for_plots:
     
     for_second_plot.append([label, f, g])
 
-fig = plt.figure()
+fig = pplt.figure()
 for element in for_second_plot:
     label, f, g = element[:]
-    plt.scatter(g, f, s = 1, color='k')
-    plt.annotate(label, xy = (g, f), xycoords = 'data', color='r', fontsize = 8)
+    pplt.scatter(g, f, s = 1, color='k')
+    pplt.annotate(label, xy = (g, f), xycoords = 'data', color='r', fontsize = 8)
 
 pplt.annotate('good', xy = (0.05, 0.05), xycoords = 'axes fraction', fontsize = 10)
 pplt.annotate('bad', xy = (0.85, 0.85), xycoords = 'axes fraction', fontsize = 10)
