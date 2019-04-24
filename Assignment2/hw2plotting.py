@@ -2,15 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-activation_fns = ['relu', 'tanh', 'sigmoid', 'exponential', 'linear']
-n_layer_possibilities = [5, 7, 11]
+activation_fns = ['relu', 'tanh', 'exponential', 'sigmoid']
+n_layer_possibilities = [5, 7, 9]
 
-information_for_plots = []
-
-for activation_fn in activation_fns:
-        for n_layers in n_layer_possibilities:
-                loss, acc, runtime = random.random(), 1e-4 + (1e-1-1e-4)*random.random(), 10**(4*random.random())
-                information_for_plots.append([activation_fn, n_layers, loss, acc, runtime])
+information_for_plots = np.loadtxt('results.txt')
 
 '''
 FIRST PLOT
@@ -108,11 +103,8 @@ for element in for_second_plot:
 plt.annotate('good', xy = (0.05, 0.05), xycoords = 'axes fraction', fontsize = 10)
 plt.annotate('bad', xy = (0.85, 0.85), xycoords = 'axes fraction', fontsize = 10)
 plt.xlabel('Runtime [s]', fontsize = 12)
-plt.xscale('log')
-plt.yscale('log')
-plt.ylabel('(1 - Accuracy) [$\%$/100]', fontsize = 12)
+plt.ylabel('Accuracy [$\%$/100]', fontsize = 12)
 plt.title('Evaluating CNN Performance', fontsize = 12)
 plt.tight_layout()
 plt.savefig('homework2_secondplot.pdf')
 plt.close()
-
