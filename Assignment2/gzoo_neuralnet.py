@@ -11,22 +11,27 @@ import keras.backend as K
 from keras import datasets, layers, models
 from sklearn.model_selection import train_test_split
 
+#os.environ["CUDA_VISIBLE_DEVICES"] = '0-7' #use GPU with ID = 0
+#doesn't need the above line, taken care of in bashrc I think
+
 jpg_paths = glob.glob('data/images_training_rev1/*.jpg')
 jpg_paths = np.sort(jpg_paths)
 
 #Loading all images
+#list comprehension for commented block above
 galaxy_images = [cv2.resize(cv2.imread(jpg_paths[i], 0), dsize = (60, 60), interpolation = cv2.INTER_CUBIC) for i in range(len(jpg_paths))]
-        
+
 #Get predicitions
 solutions = np.loadtxt('data/training_solutions_rev1.csv', delimiter = ',', skiprows=1)
 classification_solutions = []
 for i in range(len(solutions)):
     classification_solutions.append(np.argmax(solutions[i][1:]))
 
-images_train, images_test, solutions_train, solutions_test = train_test_split(galaxy_images, classification_solutions , test_size=0.3, random_state=42)
+images_train, images_test, solutions_train, solutions_test = train_test_split(galaxy_images, classification_solutions, test_size=0.3, random_state=42)
 
 
 #Normalize pixel values to be between 0 and 1
+#not sure the maximum value would be 255 still
 
 maxs_train = [max(it.flatten()) for it in images_train]
 maxs_test = [max(it.flatten()) for it in images_test]
@@ -48,23 +53,23 @@ solutions_test[solutions_test == 13] = 3
 solutions_test[solutions_test == 14] = 4
 
 '''
-input types of CNN(...) must be string and integer, respectively
-activation functions available are listed on Keras documentation
-example activation functions:  'relu', 'tanh', 'sigmoid', 'exponential', 'linear'
-'''
+    input types must be string and integer, respectively
+    activation functions available are listed on Keras documentation
+    example activation functions:  'relu', 'tanh', 'sigmoid', 'exponential', 'linear'
+    '''
 
-def CNN(activation_fn, n_layers):
-        
-    #returns a CNN with the input number of convolution/pooling layers
-    
+def CNN(activation_fn, n_extralayers):
+    '''
+    returns a CNN with the input number of convolution/pooling layers
+        '''
     model = models.Sequential()
     model.add(layers.Conv2D(filters=96, kernel_size=11, strides=4, padding='same', activation=activation_fn, input_shape=(60,60,1)))
     model.add(layers.MaxPooling2D(pool_size=3, strides=2,padding='same'))
-    model.add(layers.Conv2D(filters=265, kernel_size=5, padding='same', activation=activation_fn))
+    model.add(layers.Conv2D(filters=256, kernel_size=5, padding='same', activation=activation_fn))
     model.add(layers.MaxPooling2D(pool_size=3, strides=2,padding='same'))
             
-    n = 2
-    while n < n_layers - 4:
+    n = 0
+    while n < n_extralayers:
         model.add(layers.Conv2D(filters=384, kernel_size=3, padding='same', activation=activation_fn))
         n += 1
     model.add(layers.Conv2D(filters=256, kernel_size=3, padding='same', activation=activation_fn))
@@ -82,28 +87,28 @@ def CNN(activation_fn, n_layers):
                     
     return model
 
-def CNN_performance(activation_fn, n_layers):
-        
-    #returns loss, accuracy, and runtime when evaluated on the testing data
-
+def CNN_performance(activation_fn, n_extralayers):
+    '''
+    returns loss, accuracy, and runtime when evaluated on the testing data
+        '''
     A = time.time()
-    model = CNN(activation_fn, n_layers)
+    model = CNN(activation_fn, n_extralayers)
     test_loss, test_acc = model.evaluate(images_test, solutions_test)
     B = time.time()
     runtime = B-A
     return test_loss, test_acc, runtime
 
 '''
-creating data necessary for plots
-each element of the data list is activation_fn, n_layers, loss, acc, runtime
-'''
+    creating data necessary for plots
+    each element of the data list is activation_fn, n_extralayers, loss, acc, runtime
+    '''
 
 activation_fns = ['relu', 'tanh', 'exponential', 'sigmoid']
-n_layer_possibilities = [5, 7, 9]
+n_extralayer_possibilities = [0, 1, 3]
 
 information_for_plots = []
 
 for activation_fn in activation_fns:
-    for n_layers in n_layer_possibilities:
-        loss, acc, runtime = CNN_performance(activation_fn, n_layers)
-        information_for_plots.append([activation_fn, n_layers, loss, acc, runtime]
+    for n_extralayers in n_extralayer_possibilities:
+        loss, acc, runtime = CNN_performance(activation_fn, n_extralayers)
+        information_for_plots.append([activation_fn, n_extralayers, loss, acc, runtime])
