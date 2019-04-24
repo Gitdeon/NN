@@ -135,7 +135,7 @@ for_second_plot, Xs, Ys = [], [], []
 
 for ifp in information_for_plots:
     label = str(ifp[0]) + ', ' + str(ifp[1])
-    f = 1-ifp[3]
+    f = ifp[3]
     g = ifp[4]
     
     Xs.append(g)
@@ -149,12 +149,10 @@ for element in for_second_plot:
     pplt.scatter(g, f, s = 1, color='k')
     pplt.annotate(label, xy = (g, f), xycoords = 'data', color='r', fontsize = 8)
 
-pplt.annotate('good', xy = (0.05, 0.05), xycoords = 'axes fraction', fontsize = 10)
-pplt.annotate('bad', xy = (0.85, 0.85), xycoords = 'axes fraction', fontsize = 10)
+pplt.annotate('good', xy = (0.05, 0.85), xycoords = 'axes fraction', fontsize = 10)
+pplt.annotate('bad', xy = (0.85, 0.05), xycoords = 'axes fraction', fontsize = 10)
 pplt.xlabel('Runtime [s]', fontsize = 12)
-pplt.xscale('log')
-pplt.yscale('log')
-pplt.ylabel('(1 - Accuracy) [$\%$/100]', fontsize = 12)
+pplt.ylabel('Accuracy [$\%$/100]', fontsize = 12)
 pplt.title('Evaluating CNN Performance', fontsize = 12)
 pplt.tight_layout()
 pplt.savefig('homework2_secondplot.pdf')
