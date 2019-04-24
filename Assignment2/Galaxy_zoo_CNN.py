@@ -1,3 +1,10 @@
+'''
+    The Galaxy Zoo data can be found on Kaggle:
+    https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge/data#_=_
+    '''
+
+print('Importing necessary packages ...')
+
 import glob
 import os
 import time
@@ -11,14 +18,11 @@ import keras.backend as K
 from keras import datasets, layers, models
 from sklearn.model_selection import train_test_split
 
-#os.environ["CUDA_VISIBLE_DEVICES"] = '0-7' #use GPU with ID = 0
-#doesn't need the above line, taken care of in bashrc I think
-
 jpg_paths = glob.glob('data/images_training_rev1/*.jpg')
 jpg_paths = np.sort(jpg_paths)
 
+print('Reading and converting galaxy images ... (This takes some time)')
 #Loading all images
-#list comprehension for commented block above
 galaxy_images = [cv2.resize(cv2.imread(jpg_paths[i], 0), dsize = (60, 60), interpolation = cv2.INTER_CUBIC) for i in range(len(jpg_paths))]
 
 #Get predicitions
@@ -29,16 +33,13 @@ for i in range(len(solutions)):
 
 images_train, images_test, solutions_train, solutions_test = train_test_split(galaxy_images, classification_solutions, test_size=0.3, random_state=42)
 
-
+print('Preparing images for CNN ...')
 #Normalize pixel values to be between 0 and 1
 #not sure the maximum value would be 255 still
-
 maxs_train = [max(it.flatten()) for it in images_train]
 maxs_test = [max(it.flatten()) for it in images_test]
-
 max_train = max(maxs_train)
 max_test = max(maxs_test)
-
 images_train = [np.array(images_train[i]/max_train) for i in range(len(images_train))]
 images_test = [np.array(images_test[i]/max_test) for i in range(len(images_test))]
 
@@ -47,6 +48,8 @@ images_train = np.array(images_train).reshape(len(images_train), 60, 60, 1)
 images_test = np.array(images_test).reshape(len(images_test), 60, 60, 1)
 solutions_train = np.array(solutions_train)
 solutions_test = np.array(solutions_test)
+
+#changing class index labels in order to prepare for categorical loss function.
 solutions_train[solutions_train == 13] = 3
 solutions_train[solutions_train == 14] = 4
 solutions_test[solutions_test == 13] = 3
@@ -108,6 +111,7 @@ n_extralayer_possibilities = [0, 1, 3]
 
 information_for_plots = []
 
+print('Training Networks ...')
 for activation_fn in activation_fns:
     for n_extralayers in n_extralayer_possibilities:
         loss, acc, runtime = CNN_performance(activation_fn, n_extralayers)
